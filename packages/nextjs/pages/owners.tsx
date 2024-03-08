@@ -5,8 +5,8 @@ import { Abi, encodeFunctionData } from "viem";
 import { Address, AddressInput, IntegerInput } from "~~/components/scaffold-eth";
 import { useDeployedContractInfo, useScaffoldContractRead, useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 
-export type Method = "addSigner" | "removeSigner" | "transferFunds";
-export const METHODS: Method[] = ["addSigner", "removeSigner", "transferFunds"];
+export type Method = "addSigner" | "removeSigner" | "transferFunds" | "mintTokens";
+export const METHODS: Method[] = ["addSigner", "removeSigner", "transferFunds" , "mintTokens"];
 export const OWNERS_METHODS = METHODS.filter(m => m !== "transferFunds");
 
 export const DEFAULT_TX_DATA = {

@@ -3,8 +3,13 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { AddressInfo } from "net";
+import { exec } from "child_process";
+import { promisify } from "util"; // Node.js utility to promisify callbacks
 
-dotenv.config();
+dotenv.config({path: '..//hardhat/.env'});
+
+// Promisify exec to use it with async/await
+const execAsync = promisify(exec);
 
 type Transaction = {
   // [TransactionData type from next app]. Didn't add it since not in use
@@ -37,6 +42,30 @@ app.post("/", async (req, res) => {
   transactions[key][req.body.hash] = req.body;
   console.log("transactions", transactions);
 });
+
+app.post("/deploy" , async (req , res) => {
+
+  try{
+    console.log("@@body",req.body)
+    console.log("@@addresses",req.body.Addresses)
+    console.log("@@SIGNATURES_REQUIRED",req.body.Sig_Required)
+     // Set environment variables based on args
+     process.env.ADDRESSES = req.body.Addresses;
+     process.env.SIGNATURES_REQUIRED = req.body.Sig_Required;
+    
+    process.chdir("../../"); // Change to the root directory
+    const {stdout , stderr} = await execAsync("yarn deploy")
+    console.log("stdout: ", stdout);
+    if (stderr) {
+      console.error(`stderr: ${stderr}`)
+      return res.status(500).send(stderr)
+    }
+    res.status(200).send(stderr)
+  } catch (error) {
+    console.error(`exec error: ${error.message}`)
+    return res.status(500).send(error.message)
+  }
+})
 
 const PORT = process.env.PORT || 49832;
 const server = app
